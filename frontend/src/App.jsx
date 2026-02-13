@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Servicios from './pages/Servicios';
 import logoReyCaro from './assets/logoo.png'; // <--- Importamos la imagen
+import Login from './components/Login';
 
 function App() {
   const solicitarTurno = () => {
@@ -11,6 +12,8 @@ function App() {
   const proximamente = () => {
     alert("¡Próximamente! Estamos trabajando para ofrecerte turnos online en breve.");
   };
+
+  const [usuario, setUsuario] = useState(null);
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -42,15 +45,15 @@ function App() {
           </nav>
 
           {/* BOTÓN DE ACCIÓN */}
-          <button
-            onClick={proximamente}
+          <Link
+            to="/turnos"
             className="inline-flex items-center bg-green-600 border-0 py-2 px-4 focus:outline-none hover:bg-green-700 rounded text-white font-bold mt-4 md:mt-0 transition shadow-sm hover:shadow-md"
           >
             Turnos Online
             <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-1" viewBox="0 0 24 24">
               <path d="M5 12h14M12 5l7 7-7 7"></path>
             </svg>
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -114,6 +117,35 @@ function App() {
         {/* RUTA 2: PÁGINA DE SERVICIOS */}
         <Route path="/servicios" element={<Servicios />} />
 
+        {/* RUTA 3: TURNOS ONLINE (CON MURO DE LOGIN) */}
+        <Route path="/turnos" element={
+          <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+
+            {/* CONDICIONAL TERNARIO: ¿Existe usuario? */}
+            {usuario ? (
+              // SI HAY USUARIO: Mostramos el Formulario de Reserva
+              <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
+                <div className="text-center">
+                  <h2 className="text-3xl font-extrabold text-blue-900">Hola, {usuario.rol}!</h2>
+                  <p className="mt-2 text-gray-600">Ya podés reservar tu turno.</p>
+                </div>
+                <ReservaTurno />
+
+                {/* Botón para Cerrar Sesión (Opcional pero útil) */}
+                <button
+                  onClick={() => setUsuario(null)}
+                  className="mt-4 w-full text-red-500 text-sm hover:underline"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            ) : (
+              // NO HAY USUARIO: Mostramos el Login
+              <Login onLoginSuccess={(datosUsuario) => setUsuario(datosUsuario)} />
+            )}
+
+          </div>
+        } />
       </Routes>
 
       {/* SECCIÓN UBICACIÓN (MAPA REAL) */}
